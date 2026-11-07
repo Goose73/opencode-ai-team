@@ -36,3 +36,16 @@ test('installed fallback V2 setup registers hooks and disposes cleanly', async (
   await cleanup();
   assert.equal(disposed.length, 8);
 });
+
+const classifier = path.join(cached, 'dist', 'error-classifier.js');
+test('classifier matches quota/rate patterns (provider-free, real implementation)', { skip: !existsSync(classifier) && 'error-classifier not found' }, async () => {
+  const { isRetryableError } = await import(pathToFileURL(classifier));
+  const retryOn = [429, 500, 502, 503, 504, 529];
+  const patterns = ['usage\\s*limit', 'hit your usage limit', 'usage_limit_reached', 'exceeded your current quota', 'insufficient_quota', '\\bquota\\b', 'plan limit', 'rate limit', 'too many requests', 'model overloaded', 'provider overloaded'];
+  assert.equal(isRetryableError({ status: 429, message: 'rate limited' }, retryOn, patterns), true);
+  assert.equal(isRetryableError({ message: "You've hit your usage limit" }, retryOn, patterns), true);
+  assert.equal(isRetryableError({ message: 'usage_limit_reached' }, retryOn, patterns), true);
+  assert.equal(isRetryableError({ message: 'model overloaded' }, retryOn, patterns), true);
+  assert.equal(isRetryableError({ message: 'syntax error in code' }, retryOn, patterns), false);
+  // Limitations: does not prove hook/event timing, model inventory, or live host recovery.
+});
