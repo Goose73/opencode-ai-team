@@ -1,0 +1,15 @@
+Project-local
+- Open `C:\Users\Goose\Documents\OpenCode-AI-Team` in OpenCode.
+- Select `ai-team-leader`.
+- Ask: "Build me a C# application that does X." The leader should plan, delegate to real `ai-team-*` subagents, require approved checks, and report verified results.
+
+Preferred/fallback models
+- Leader prefers `openai/gpt-6-astra` (ChatGPT Plus). If quota is exhausted, continue with a configured free model where supported.
+- Verified free models: `opencode/deepseek-v4.1-flash-free`, `opencode/glm-5.3-flash-free`, `opencode/iceman-free`.
+- Global runtime fallback (if configured/loaded): 3-model chain with retry limits; live quota recovery not fully proven on this setup.
+
+Safe global install (inspect first)
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\install.ps1 -WhatIf
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\install.ps1
+
+Do not use `--auto`. Review shell prompts. Destructive deletion, external writes, publishing, and deployment require explicit approval.
